@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <style>
+            body { 
+                background-color: #333;
+                color:white;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+            textarea {
+                background-color: #333;
+                color: #aaa
+            }
+            button {
+                background-color: #333;
+                padding: px;
+                border-radius: 2px;
+                width: 128px;
+                height: 50px;
+                color:white;
+            }
+            a {
+                color: #0af;
+            }
+        </style>
+    </head>
+    <body>
+        <center>
+            <h1>Very basic D2L PDF link grabber</h1>
+            <p>Instructions:</p>
+            <p>1. CTRL + U, CTRL + A, CTRL + C</p>
+            <p>2. CTRL + V below, click Grab</p>
+            <textarea placeholder="HTML Code" id="code" style="width: 25%; height: 150px;"></textarea>
+            <br><br>
+            <button onclick="grab()">Grab</button>
+            <br>
+            <p><u>PDF URL:</u></p>
+            <p><em id="result" style="user-select: all;"></em></p>
+            <p><a href="" id="result2"></a></p>
+            <p><a href="" target="_blank" id="result3"></a></p>
+        </center>
+    </body>
+    <script>
+        function grab() {
+            let code = document.getElementById('code').value;
+            let codeSplitLines = code.split(/\r?\n/);
+            for (var i in codeSplitLines) {
+                var line = codeSplitLines[i];
+                if (line.toLowerCase().includes("d2l-fileviewer-pdf-pdfjs")) {
+                    try {
+                        var location = line.split("location=\"")[1].split("\" ")[0];      
+                        console.log("Location (PDF): " + location);              
+                        if (location.includes("http") == false) {
+                            location = ("https://d2l.cbe.ab.ca/d2l/common/assets/pdfjs-d2l-dist/1.0.14-legacy/web/viewer.html?file=https://d2l.cbe.ab.ca/" + location).replace("//", '/')
+                        }
+                        document.getElementById('result').innerText = location;
+                        document.getElementById('result2').setAttribute('href', location);
+                        document.getElementById('result3').setAttribute('href', location);
+                        document.getElementById('result2').innerText = "Open link here";
+                        document.getElementById('result3').innerText = "Open link in a new tab";
+                        return;
+                    } catch (e) {}
+                }
+                else if (line.toLowerCase().includes("d2l-fileviewer-rendered-pdf")) {
+                    try {
+                        var location = line.split("src=\"")[1].split("\" ")[0];                    
+                        console.log("Location (DOCX): " + location);
+                        document.getElementById('result').innerText = `https://d2l.cbe.ab.ca${location}`;
+                        document.getElementById('result2').setAttribute('href', `https://d2l.cbe.ab.ca${location}`);
+                        document.getElementById('result3').setAttribute('href', `https://d2l.cbe.ab.ca${location}`);
+                        document.getElementById('result2').innerText = "Open link here";
+                        document.getElementById('result3').innerText = "Open link in a new tab";
+                        return;
+                    } catch (e) {}
+                }
+            }
+            document.getElementById('result').innerText = `No PDF URL detected.`;
+            document.getElementById('result2').innerText = "";
+            document.getElementById('result3').innerText = "";
+        }
+
+    </script>
+</html>
